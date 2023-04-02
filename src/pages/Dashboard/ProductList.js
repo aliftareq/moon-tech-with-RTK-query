@@ -1,27 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { toast } from "react-hot-toast";
-import { useDispatch, useSelector } from "react-redux";
-import { getProducts, removeProduct, toggleDeletesuccess } from "../../Features/Products/ProductsSlice";
+import { useGetProductsQuery, useRemoveProductMutation } from "../../Features/API/apiSlice";
 
 const ProductList = () => {
 
-  const product = useSelector((state) => state.product);
-  const { products, isLoading, deletesuccess, error, isError } = product
-  const dispatch = useDispatch()
+  const [removeProduct] = useRemoveProductMutation()
+  const { data, isLoading, isSuccess } = useGetProductsQuery()
+  const products = data?.data
 
-  useEffect(() => {
-    dispatch(getProducts())
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (!isLoading && deletesuccess) {
-      toast.success("product deleted successfully", { id: 'removeProduct' })
-    }
-    if (!isLoading && isError) {
-      toast.error(error, { id: 'removeProduct' })
-    }
-  }, [isLoading, deletesuccess, error, isError])
-
+  if (isLoading) {
+    return <p className="text-5xl text-center">Loading...</p>
+  }
 
 
   return (
@@ -55,7 +43,7 @@ const ProductList = () => {
             </thead>
 
             <tbody className='text-sm divide-y divide-gray-100'>
-              {products.map(({ model, brand, price, status, _id }) => (
+              {products?.map(({ model, brand, price, status, _id }) => (
                 <tr key={_id}>
                   <td className='p-2'>
                     <input type='checkbox' className='w-5 h-5' value='id-1' />
@@ -82,7 +70,7 @@ const ProductList = () => {
                   </td>
                   <td className='p-2'>
                     <div className='flex justify-center'>
-                      <button onClick={() => dispatch(removeProduct(_id))}>
+                      <button onClick={() => removeProduct(_id)}>
                         <svg
                           className='w-8 h-8 hover:text-blue-600 rounded-full hover:bg-gray-100 p-1'
                           fill='none'

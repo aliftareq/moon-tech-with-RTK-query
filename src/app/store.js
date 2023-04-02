@@ -1,16 +1,16 @@
 import { configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
 import logger from "redux-logger";
+import { productApi } from "../Features/API/apiSlice";
 import cartSlice from "../Features/cart/cartSlice";
 import filterSlice from "../Features/filter/filterSlice";
-import ProductsSlice from "../Features/Products/ProductsSlice";
 
 const store = configureStore({
     reducer: {
         cart: cartSlice,
         filter: filterSlice,
-        product: ProductsSlice,
+        [productApi.reducerPath]: productApi.reducer,
     },
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger)
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger, productApi.middleware)
 })
 
 export default store;

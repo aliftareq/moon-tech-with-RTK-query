@@ -1,36 +1,36 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ProductCard from "../../components/ProductCard";
+import { useGetProductsQuery } from "../../Features/API/apiSlice";
 import { toggleBrand, toggleStock } from "../../Features/filter/filterSlice";
-import { getProducts } from "../../Features/Products/ProductsSlice";
 
 const Home = () => {
   const filter = useSelector((state) => state.filter);
-  const product = useSelector((state) => state.product);
   const dispatch = useDispatch()
   const { brands, stock } = filter;
-  const { products, isLoading } = product
 
-
-  useEffect(() => {
-    dispatch(getProducts())
-  }, [dispatch]);
+  const { data, isLoading, isSuccess, isError, error } = useGetProductsQuery(null, { refetchOnMountOrArgChange: true });
+  const products = data?.data
+  console.log();
 
   const activeClass = "text-white  bg-indigo-500 border-white";
 
   let content;
 
   if (isLoading) {
-    content = <h1 className="text-5xl text-center">Loading...</h1>
+    content = <p className="text-5xl text-center">Loading...</p>
+  }
+  if (isError) {
+    content = <p className="text-xl">oooopps!... something went wrong.</p>
   }
 
-  if (products.length) {
+  if (products?.length) {
     content = products.map((product) => (
       <ProductCard key={product.model} product={product} />
     ));
   }
 
-  if (products.length && (stock || brands.length)) {
+  if (products?.length && (stock || brands?.length)) {
     content = products
       .filter((product) => {
         if (stock) {
@@ -39,7 +39,7 @@ const Home = () => {
         return product;
       })
       .filter((product) => {
-        if (brands.length) {
+        if (brands?.length) {
           return brands.includes(product.brand);
         }
         return product;
@@ -68,7 +68,9 @@ const Home = () => {
         </button>
       </div>
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-14'>
-        {content}
+        {
+          content
+        }
       </div>
     </div>
   );
